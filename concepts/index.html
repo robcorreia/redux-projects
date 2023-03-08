@@ -8,83 +8,36 @@
     <script src="./redux.min.js"></script>
   </head>
   <body>
-    <div>
-      <h1>Total: <span id="total"></span></h1>
-      <button id="incrementar">Incrementar</button>
-      <button id="abrir">Abrir</button>
-      <button id="fechar">Fechar</button>
-    </div>
+    <div id="box" style="background: blue; height: 50px"></div>
 
     <script>
-      // Constants
-      const INCREMENTAR = "incrementar";
-      const SOMAR = "somar";
-
-      // Action Creator
-      function incrementar() {
-        return { type: INCREMENTAR };
-      }
-
-      function somar(payload) {
-        return { type: SOMAR, payload };
-      }
-
-      const initialState = 0;
-
-      function contador(state = initialState, action) {
+      function reducer(state = 0, action) {
         switch (action.type) {
-          case INCREMENTAR:
-            return state + 1;
-          case SOMAR:
-            return state + action.payload;
+          case "CHANGE_WIDTH":
+            return action.payload;
           default:
             return state;
         }
       }
 
-      function modal(state = false, action) {
-        switch (action.type) {
-          case "ABRIR":
-            return true;
-          case "FECHAR":
-            return false;
-          default:
-            return state;
-        }
-      }
-
-      const reducer = Redux.combineReducers({ contador, modal });
-
-      const store = Redux.createStore(reducer);
+      const store = Redux.createStore(
+        reducer,
+        window.__REDUX_DEVTOOLS_EXTENSION__ &&
+          window.__REDUX_DEVTOOLS_EXTENSION__()
+      );
 
       function render() {
-        const { contador, modal } = store.getState();
-
-        const total = document.getElementById("total");
-        total.innerHTML = contador;
-        if (modal) {
-          total.style.display = "inline-block";
-        } else {
-          total.style.display = "none";
-        }
+        const box = document.getElementById("box");
+        box.style.width = store.getState() + "px";
       }
-
-      render();
-
-      // store.dispatch(somar(5));
 
       store.subscribe(render);
 
-      const button = document.getElementById("incrementar");
-
-      const abrir = document.getElementById("abrir");
-      const fechar = document.getElementById("fechar");
-
-      button.addEventListener("click", () => store.dispatch(incrementar()));
-      abrir.addEventListener("click", () => store.dispatch({ type: "ABRIR" }));
-      fechar.addEventListener("click", () =>
-        store.dispatch({ type: "FECHAR" })
-      );
+      store.dispatch({ type: "CHANGE_WIDTH", payload: 100 });
+      store.dispatch({ type: "CHANGE_WIDTH", payload: 20 });
+      store.dispatch({ type: "CHANGE_WIDTH", payload: 30 });
+      store.dispatch({ type: "CHANGE_WIDTH", payload: 200 });
+      console.log(store.getState());
     </script>
   </body>
 </html>
