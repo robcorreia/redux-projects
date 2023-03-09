@@ -6,19 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="./redux.min.js"></script>
+    <script src="./immer.umd.production.min.js"></script>
   </head>
   <body>
-    <div id="box" style="background: blue; height: 50px"></div>
-
     <script>
-      function reducer(state = 0, action) {
+      const array1 = [0, 1, 2, 3, 4];
+      const array2 = [...array1];
+
+      console.log(array1 === array2);
+
+      const obj1 = {
+        nome: "Robson",
+        idade: "28",
+      };
+
+      const obj2 = immer.produce(obj1, (draft) => {
+        draft.idade = 35;
+      });
+      console.log(obj2);
+
+      // // const obj2 = {
+      // //   ...obj1,
+      // // };
+
+      // const obj2 = Object.assign({}, obj1);
+
+      console.log(obj1 === obj2);
+
+      const initialState = {
+        nome: "Robson",
+        idade: "28",
+      };
+
+      const reducer = immer.produce((state, action) => {
         switch (action.type) {
-          case "CHANGE_WIDTH":
-            return action.payload;
-          default:
-            return state;
+          case "CHANGE_NAME":
+            state.nome = action.payload;
+            break;
+          case "CHANGE_AGE":
+            state.idade = action.payload;
+            break;
         }
-      }
+      }, initialState);
 
       const store = Redux.createStore(
         reducer,
@@ -26,18 +55,10 @@
           window.__REDUX_DEVTOOLS_EXTENSION__()
       );
 
-      function render() {
-        const box = document.getElementById("box");
-        box.style.width = store.getState() + "px";
-      }
-
-      store.subscribe(render);
-
-      store.dispatch({ type: "CHANGE_WIDTH", payload: 100 });
-      store.dispatch({ type: "CHANGE_WIDTH", payload: 20 });
-      store.dispatch({ type: "CHANGE_WIDTH", payload: 30 });
-      store.dispatch({ type: "CHANGE_WIDTH", payload: 200 });
-      console.log(store.getState());
+      store.dispatch({ type: "CHANGE_NAME", payload: "Rob" });
+      store.dispatch({ type: "CHANGE_NAME", payload: "Robs" });
+      store.dispatch({ type: "CHANGE_NAME", payload: "Robso" });
+      store.dispatch({ type: "CHANGE_AGE", payload: "20" });
     </script>
   </body>
 </html>
