@@ -5,60 +5,47 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script src="./redux.min.js"></script>
     <script src="./immer.umd.production.min.js"></script>
+    <script src="./redux.min.js"></script>
   </head>
   <body>
-    <script>
-      const array1 = [0, 1, 2, 3, 4];
-      const array2 = [...array1];
+    <h2 id="aulas"></h2>
+    <h2 id="aluno"></h2>
 
-      console.log(array1 === array2);
+    <script type="module">
+      import store from "./store/configureStore.js";
+      import {
+        incrementarTempo,
+        reduzirTempo,
+        modificarEmail,
+      } from "./store/reducers/aluno.js";
+      import {
+        completarAula,
+        completarCurso,
+        resetarCurso,
+      } from "./store/reducers/aulas.js";
 
-      const obj1 = {
-        nome: "Robson",
-        idade: "28",
-      };
+      function render() {
+        const { aulas, aluno } = store.getState();
+        const aulasElement = document.getElementById("aulas");
+        const alunoElement = document.getElementById("aluno");
 
-      const obj2 = immer.produce(obj1, (draft) => {
-        draft.idade = 35;
-      });
-      console.log(obj2);
+        aulasElement.innerText = `${aluno.nome} : ${aluno.email} : ${aluno.diasRestantes}`;
+        alunoElement.innerText = aulas.filter(
+          (aula) => aula.completa === true
+        ).length;
+      }
 
-      // // const obj2 = {
-      // //   ...obj1,
-      // // };
-
-      // const obj2 = Object.assign({}, obj1);
-
-      console.log(obj1 === obj2);
-
-      const initialState = {
-        nome: "Robson",
-        idade: "28",
-      };
-
-      const reducer = immer.produce((state, action) => {
-        switch (action.type) {
-          case "CHANGE_NAME":
-            state.nome = action.payload;
-            break;
-          case "CHANGE_AGE":
-            state.idade = action.payload;
-            break;
-        }
-      }, initialState);
-
-      const store = Redux.createStore(
-        reducer,
-        window.__REDUX_DEVTOOLS_EXTENSION__ &&
-          window.__REDUX_DEVTOOLS_EXTENSION__()
-      );
-
-      store.dispatch({ type: "CHANGE_NAME", payload: "Rob" });
-      store.dispatch({ type: "CHANGE_NAME", payload: "Robs" });
-      store.dispatch({ type: "CHANGE_NAME", payload: "Robso" });
-      store.dispatch({ type: "CHANGE_AGE", payload: "20" });
+      render();
+      store.subscribe(render);
+      store.dispatch(incrementarTempo());
+      store.dispatch(incrementarTempo());
+      store.dispatch(reduzirTempo());
+      store.dispatch(modificarEmail("joão@origamid.com"));
+      store.dispatch(completarAula(2));
+      store.dispatch(completarAula(3));
+      store.dispatch(resetarCurso());
+      store.dispatch(completarCurso());
     </script>
   </body>
 </html>
