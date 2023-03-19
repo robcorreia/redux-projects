@@ -1,32 +1,40 @@
-function reducer(state = 0, action) {
-  console.log("reducer");
+const initialState = {
+  loading: false,
+  data: null,
+  error: null,
+};
+
+function reducer(state = initialState, action) {
   switch (action.type) {
-    case "INCREMENTAR":
-      return state + 1;
-    case "REDUZIR":
-      return state - 1;
+    case "FETCH_STARTED":
+      return {
+        ...state,
+        loading: true,
+      };
+    case "FETCH_SUCCESS":
+      return {
+        data: action.payload,
+        loading: false,
+        error: null,
+      };
+    case "FETCH_ERROR":
+      return {
+        data: null,
+        loading: false,
+        error: action.payload,
+      };
     default:
       return state;
   }
 }
 
-const logger = (store) => (next) => (action) => {
-  console.group(action.type);
-  console.log("action", action);
-  console.log("prev state", store.getState());
-
-  const result = next(action);
-
-  console.log("new state", store.getState());
-
-  console.groupEnd();
-  next(action);
-  return result;
-};
-
-const reduzirMiddle = (store) => (next) => (action) => {
-  if (action.type === "REDUZIR") window.alert("Reduziu");
-  return next(action);
+// thunk
+const thunk = (store) => (next) => (action) => {
+  if (typeof action === "function") {
+    return action(store.dispatch, store.getState);
+  } else {
+    return next(action);
+  }
 };
 
 const { applyMiddleware, compose } = Redux;
@@ -34,12 +42,21 @@ const { applyMiddleware, compose } = Redux;
 const composeEnchancers =
   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const enhancer = composeEnchancers(applyMiddleware(logger, reduzirMiddle));
+const enhancer = composeEnchancers(applyMiddleware(thunk));
 
 const store = Redux.createStore(reducer, enhancer);
 
-console.log(store.getState());
+// Action Creator, retorna uma função ao invés de um objeto
+function fetchUrl(url) {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: "FETCH_STARTED" });
+      const data = await fetch(url).then((r) => r.json());
+      dispatch({ type: "FETCH_SUCCESS", payload: data });
+    } catch (error) {
+      dispatch({ type: "FETCH_ERROR", payload: error.message });
+    }
+  };
+}
 
-store.dispatch({ type: "INCREMENTAR" });
-// // const testee = store.dispatch({ type: "REDUZIR" });
-// console.log(testee);
+store.dispatch(fetchUrl("https://dogsapi.origamid.dev/json/api/photo"));
