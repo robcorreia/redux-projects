@@ -12,40 +12,6 @@
     <h2 id="aulas"></h2>
     <h2 id="aluno"></h2>
 
-    <script type="module">
-      import store from "./store/configureStore.js";
-      import {
-        incrementarTempo,
-        reduzirTempo,
-        modificarEmail,
-      } from "./store/reducers/aluno.js";
-      import {
-        completarAula,
-        completarCurso,
-        resetarCurso,
-      } from "./store/reducers/aulas.js";
-
-      function render() {
-        const { aulas, aluno } = store.getState();
-        const aulasElement = document.getElementById("aulas");
-        const alunoElement = document.getElementById("aluno");
-
-        aulasElement.innerText = `${aluno.nome} : ${aluno.email} : ${aluno.diasRestantes}`;
-        alunoElement.innerText = aulas.filter(
-          (aula) => aula.completa === true
-        ).length;
-      }
-
-      render();
-      store.subscribe(render);
-      store.dispatch(incrementarTempo());
-      store.dispatch(incrementarTempo());
-      store.dispatch(reduzirTempo());
-      store.dispatch(modificarEmail("joão@origamid.com"));
-      store.dispatch(completarAula(2));
-      store.dispatch(completarAula(3));
-      store.dispatch(resetarCurso());
-      store.dispatch(completarCurso());
-    </script>
+    <script type="module" src="script.js"></script>
   </body>
 </html>
