@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "./store/reducers/login";
+import { autoLogin, login } from "./store/reducers/login";
+import { somar } from "./store/reducers/contador";
 
 
 function App() {
@@ -8,13 +9,17 @@ function App() {
   const [password, setPassword] = useState('')
 
   const dispatch = useDispatch()
-  const { data } = useSelector(state => state.login.user)
-  console.log(data)
 
   function handleSubmit(e) {
     e.preventDefault()
     dispatch(login({ username, password }))
   }
+
+  const { data } = useSelector(state => state.login.user)
+  console.log(data)
+  useEffect(() => {
+    dispatch(autoLogin());
+  }, [dispatch])
 
   return (
     <div>
@@ -40,6 +45,7 @@ function App() {
         </div>
       </form>
       <p>{data?.email}</p>
+      <button onClick={() => dispatch(somar(5))}>Somar</button>
     </div>
   );
 }
